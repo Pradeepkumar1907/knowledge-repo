@@ -1,0 +1,15 @@
+Users Collection
+{
+  "username": "admin",
+  "password": "password123", // Stored as plain text for this project
+  "role": "admin" // 'admin' or 'user'
+}
+
+Knowledge Collection
+{
+  "title": "What is JavaScript?",
+  "category": "Programming",
+  "content": "JavaScript is used to create interactive web pages.",
+  "author": "Admin",
+  "createdAt": "Date"
+}
