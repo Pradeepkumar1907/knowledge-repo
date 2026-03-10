@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const router = express.Router();
 const User = require('../models/User');
+const Knowledge = require('../models/Knowledge'); // Added to query liked articles
 const auth = require('../middleware/auth');
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -71,7 +72,9 @@ router.post('/auth/google', async (req, res) => {
                     name: user.name,
                     email: user.email,
                     profilePicture: user.profilePicture,
-                    role: null
+                    role: null,
+                    followersCount: user.followers?.length || 0,
+                    followingCount: user.following?.length || 0
                 }
             });
         }
@@ -92,7 +95,9 @@ router.post('/auth/google', async (req, res) => {
                 profilePicture: user.profilePicture,
                 role: user.role,
                 recentlyVisited: user.recentlyVisited || [],
-                readArticles: user.readArticles || []
+                readArticles: user.readArticles || [],
+                followersCount: user.followers?.length || 0,
+                followingCount: user.following?.length || 0
             }
         });
     } catch (err) {
@@ -147,7 +152,9 @@ router.post('/auth/set-role', auth.requireAuth, async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                followersCount: user.followers?.length || 0,
+                followingCount: user.following?.length || 0
             }
         });
 
@@ -163,6 +170,11 @@ router.get('/me', auth.requireAuth, async (req, res) => {
             .populate('recentlyVisited.article')
             .populate('readArticles');
         if (!user) return res.status(404).json({ error: "User not found" });
+
+        // Calculate how many articles this user has liked robustly
+        const identifiers = [user.username, user.name, user.email].filter(Boolean);
+        const likedCount = await Knowledge.countDocuments({ likes: { $in: identifiers } });
+
         res.json({
             id: user._id,
             name: user.name,
@@ -171,7 +183,10 @@ router.get('/me', auth.requireAuth, async (req, res) => {
             userType: user.userType || 'student',
             role: user.role,
             recentlyVisited: user.recentlyVisited || [],
-            readArticles: user.readArticles || []
+            readArticles: user.readArticles || [],
+            likedCount: likedCount,
+            followersCount: user.followers?.length || 0,
+            followingCount: user.following?.length || 0
         });
     } catch (err) {
         res.status(500).json({ error: err.message });

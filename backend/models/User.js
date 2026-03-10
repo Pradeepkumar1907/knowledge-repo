@@ -30,7 +30,16 @@ const userSchema = new mongoose.Schema({
     readArticles: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Knowledge'
+    }],
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    following: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }]
 }, { timestamps: true });
+
 
 module.exports = mongoose.model('User', userSchema);

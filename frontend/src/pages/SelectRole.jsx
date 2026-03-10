@@ -54,52 +54,66 @@ const SelectRole = () => {
             alignItems: 'center',
             justifyContent: 'center',
             height: '100vh',
-            background: '#0f172a',
-            color: 'white'
+            background: 'var(--bg-primary)',
+            color: 'var(--text-primary)'
         }}>
-            <h2 style={{ marginBottom: '2rem' }}>Select Your Role</h2>
+            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)', fontWeight: '800', fontSize: '2rem' }}>Select Your Role</h2>
             <div style={{ display: 'flex', gap: '2rem' }}>
 
                 {/* Student Card */}
                 <div
                     onClick={() => handleSelectRole('student')}
                     style={{
-                        background: '#1e293b',
+                        background: 'var(--bg-card)',
                         padding: '2rem',
-                        borderRadius: '16px',
+                        borderRadius: '24px',
                         cursor: 'pointer',
                         textAlign: 'center',
-                        width: '200px',
-                        border: '2px solid transparent',
-                        transition: 'all 0.3s'
+                        width: '240px',
+                        border: '1px solid var(--border-color)',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.borderColor = '#3b82f6'}
-                    onMouseOut={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                    }}
                 >
-                    <FaUserGraduate size={50} color="#3b82f6" style={{ marginBottom: '1rem' }} />
-                    <h3>Student</h3>
-                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Access learning materials and track progress.</p>
+                    <FaUserGraduate size={60} color="var(--accent-primary)" style={{ marginBottom: '1.5rem' }} />
+                    <h3 style={{ color: 'var(--text-primary)', margin: '0 0 10px 0', fontSize: '1.5rem' }}>Student</h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0 }}>Access learning materials and track progress.</p>
                 </div>
 
                 {/* Faculty Card */}
                 <div
                     onClick={() => handleSelectRole('faculty')}
                     style={{
-                        background: '#1e293b',
+                        background: 'var(--bg-card)',
                         padding: '2rem',
-                        borderRadius: '16px',
+                        borderRadius: '24px',
                         cursor: 'pointer',
                         textAlign: 'center',
-                        width: '200px',
-                        border: '2px solid transparent',
-                        transition: 'all 0.3s'
+                        width: '240px',
+                        border: '1px solid var(--border-color)',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
                     }}
-                    onMouseOver={(e) => e.currentTarget.style.borderColor = '#eab308'}
-                    onMouseOut={(e) => e.currentTarget.style.borderColor = 'transparent'}
+                    onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                        e.currentTarget.style.transform = 'translateY(-5px)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                    }}
                 >
-                    <FaChalkboardTeacher size={50} color="#eab308" style={{ marginBottom: '1rem' }} />
-                    <h3>Faculty</h3>
-                    <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Manage content and mentor students.</p>
+                    <FaChalkboardTeacher size={60} color="var(--accent-primary)" style={{ marginBottom: '1.5rem' }} />
+                    <h3 style={{ color: 'var(--text-primary)', margin: '0 0 10px 0', fontSize: '1.5rem' }}>Faculty</h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', margin: 0 }}>Manage content and mentor students.</p>
                 </div>
 
             </div>

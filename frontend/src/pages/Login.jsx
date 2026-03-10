@@ -34,7 +34,7 @@ const Login = () => {
                         } else if (res.data.user.role === 'faculty') {
                             navigate('/faculty-dashboard');
                         } else {
-                            navigate('/dashboard');
+                            navigate('/admin');
                         }
                     }
                 } catch (err) {
@@ -61,8 +61,8 @@ const Login = () => {
             <div className="login-brand-section">
                 <div className="brand-content">
                     <div className="brand-logo-large">
-                        <div style={{ background: '#3b82f6', padding: '10px', borderRadius: '12px', display: 'flex' }}>
-                            <FaBook style={{ color: 'white' }} />
+                        <div style={{ background: 'var(--accent-primary)', padding: '10px', borderRadius: '12px', display: 'flex' }}>
+                            <FaBook style={{ color: '#fff' }} />
                         </div>
                         KnowledgeRepo
                     </div>
@@ -73,15 +73,15 @@ const Login = () => {
 
                     <div className="feature-list">
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#3b82f6' }} />
+                            <FaCheckCircle style={{ color: 'var(--accent-primary)' }} />
                             <span>Structured Learning Resources</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#3b82f6' }} />
+                            <FaCheckCircle style={{ color: 'var(--accent-primary)' }} />
                             <span>Faculty Verified Content</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#3b82f6' }} />
+                            <FaCheckCircle style={{ color: 'var(--accent-primary)' }} />
                             <span>Smart Search & Categorization</span>
                         </div>
                     </div>
@@ -91,20 +91,20 @@ const Login = () => {
             {/* Right Login Section */}
             <div className="login-form-section">
                 <div className="login-card-modern">
-                    <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 700 }}>Welcome Back</h2>
-                    <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>Sign in to continue to your dashboard</p>
+                    <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>Welcome Back</h2>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Sign in to continue to your dashboard</p>
 
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
                         <div id="googleSignInBtn"></div>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.85rem', margin: '1.5rem 0' }}>
-                        <span style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }}></span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '1.5rem 0' }}>
+                        <span style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></span>
                         <span>OR</span>
-                        <span style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.1)' }}></span>
+                        <span style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></span>
                     </div>
 
-                    <button className="btn-primary" disabled style={{ width: '100%', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: '#94a3b8' }}>
+                    <button className="btn-primary" disabled style={{ width: '100%', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                         Continue with Phone (Coming Soon)
                     </button>
                 </div>

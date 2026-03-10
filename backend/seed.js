@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Knowledge = require('./models/Knowledge');
 const User = require('./models/User');
+const Category = require('./models/Category');
 
 // Connect to MongoDB
 const MONGO_URI = "mongodb://127.0.0.1:27017/knowledge_repo";
@@ -67,26 +68,32 @@ const seedDB = async () => {
         // Clear existing data to avoid duplicates
         await Knowledge.deleteMany({});
         await User.deleteMany({});
-        console.log("🗑️  Cleared existing knowledge and user data.");
-
-        // Skip seeding users: Google OAuth creates users on first login
-        await User.deleteMany({});
-        console.log("👤 Skipped seeding users (Google OAuth will create on login).");
+        await Category.deleteMany({});
+        console.log("🗑️  Cleared existing knowledge, user, and category data.");
 
         let docs = [];
+        let categoryDocs = [];
 
         for (let cat of categories) {
+            categoryDocs.push({
+                name: cat,
+                description: `Articles related to ${cat}.`
+            });
+
             const topics = getTopics(cat);
             for (let topic of topics) {
                 docs.push({
                     title: topic,
                     category: cat,
-                    content: `This is a detailed article/note about ${topic}. It covers the fundamental concepts, history, and practical applications in the field of ${cat}. \n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.`,
+                    content: `This is a detailed article/note about ${topic}. It covers the fundamental concepts, history, and practical applications in the field of ${cat}.`,
                     author: authors[Math.floor(Math.random() * authors.length)],
-                    createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000)) // Random past date
+                    createdAt: new Date(Date.now() - Math.floor(Math.random() * 10000000000))
                 });
             }
         }
+
+        await Category.insertMany(categoryDocs);
+        console.log(`✅ Successfully added ${categoryDocs.length} categories!`);
 
         await Knowledge.insertMany(docs);
         console.log(`✅ Successfully added ${docs.length} entries to the database!`);

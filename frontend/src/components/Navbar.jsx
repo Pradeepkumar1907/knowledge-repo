@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaBook, FaPlus, FaSignOutAlt } from 'react-icons/fa';
+import { FaBook, FaPlus, FaSignOutAlt, FaSearch, FaBell, FaCog, FaBookmark, FaThLarge, FaSun, FaMoon } from 'react-icons/fa';
 import Avatar from './Avatar';
+import { useTheme } from '../context/ThemeContext';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [user, setUser] = useState(null);
+    const { theme, toggleTheme } = useTheme();
 
-    // Refresh user verification on every route change or mount
     useEffect(() => {
         const checkUser = () => {
             const storedUser = sessionStorage.getItem('user');
@@ -20,7 +22,7 @@ const Navbar = () => {
         };
 
         checkUser();
-    }, [location.pathname]); // Update when path changes
+    }, [location.pathname]);
 
     const handleLogout = () => {
         sessionStorage.removeItem('user');
@@ -30,68 +32,84 @@ const Navbar = () => {
         navigate('/login');
     };
 
-    const isAdmin = user?.role?.toLowerCase() === 'faculty';
+    const isAdmin = user?.role?.toLowerCase() === 'admin';
+    const isFaculty = user?.role?.toLowerCase() === 'faculty' || isAdmin;
+    const isStudent = user?.role?.toLowerCase() === 'student';
 
     const getDashboardPath = () => {
         if (!user) return '/login';
-        if (user.role === 'student') return '/student-dashboard';
-        if (user.role === 'faculty') return '/faculty-dashboard';
-        return '/dashboard'; // Admin or default
+        if (isAdmin) return '/admin';
+        if (isFaculty) return '/faculty-dashboard';
+        if (isStudent) return '/student-dashboard';
+        return '/';
     };
 
     return (
-        <nav className="navbar top-bar" style={{ background: '#0f172a', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0.8rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {/* Brand Logo */}
-            <div className="navbar-brand">
-                <Link to="/" style={{ fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}>
-                    <div style={{ background: '#3b82f6', padding: '6px', borderRadius: '8px', display: 'flex' }}>
-                        <FaBook style={{ color: 'white', fontSize: '1.1rem' }} />
-                    </div>
-                    <span style={{ color: 'white', letterSpacing: '0.5px' }}>Repo.edu</span>
-                </Link>
+        <nav className="top-bar">
+            {/* Left: Brand */}
+            <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', textDecoration: 'none' }}>
+                <div style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-hover))', padding: '8px', borderRadius: '10px', display: 'flex', boxShadow: '0 0 15px rgba(59, 130, 246, 0.4)' }}>
+                    <FaBook style={{ color: 'white', fontSize: '1.2rem' }} />
+                </div>
+                <span style={{ fontSize: '1.2rem', fontWeight: '800', letterSpacing: '-0.5px', color: 'var(--text-primary)' }}>
+                    Repo<span style={{ color: 'var(--accent-primary)' }}>.edu</span>
+                </span>
+            </Link>
+
+            {/* Center: Navigation */}
+            <div className="nav-center">
+                <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Explore</Link>
+                {!isAdmin && <Link to="/categories" className={`nav-link ${location.pathname === '/categories' ? 'active' : ''}`}>Categories</Link>}
+                {user && !isAdmin && <Link to={getDashboardPath()} className={`nav-link ${location.pathname === getDashboardPath() ? 'active' : ''}`}>My Learning</Link>}
             </div>
 
-            {/* Navbar Actions */}
-            <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                <Link to="/" style={{ color: '#94a3b8', fontSize: '1rem', fontWeight: '500' }} className="nav-link">Home</Link>
+            {/* Right: Actions */}
+            <div className="nav-right">
+                <button
+                    className="icon-btn"
+                    title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    onClick={toggleTheme}
+                    style={{ color: theme === 'dark' ? '#fde047' : 'var(--text-secondary)' }}
+                >
+                    {theme === 'dark' ? <FaSun /> : <FaMoon />}
+                </button>
+
+                <button className="icon-btn" title="Search" onClick={() => navigate('/search')}>
+                    <FaSearch />
+                </button>
 
                 {user ? (
                     <>
-                        {/* Admin Action: Add New Article */}
-                        {isAdmin && (
-                            <Link to="/add">
-                                <button className="btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '5px', width: 'auto' }}>
-                                    <FaPlus size={12} /> Add New
+                        {isFaculty && (
+                            <Link to="/add" style={{ textDecoration: 'none' }}>
+                                <button className="new-btn">
+                                    <FaPlus size={12} /> <span style={{ fontSize: '0.85rem' }}>Add New</span>
                                 </button>
                             </Link>
                         )}
 
-                        {/* Profile Avatar */}
-                        <Link to={getDashboardPath()} title="My Dashboard" style={{ textDecoration: 'none' }}>
-                            <div style={{ cursor: 'pointer', transition: 'transform 0.2s' }}>
+                        <button className="icon-btn" title="Saved Articles" onClick={() => navigate('/saved')}>
+                            <FaBookmark />
+                        </button>
+
+                        <NotificationDropdown user={user} />
+
+                        <Link to={getDashboardPath()} style={{ textDecoration: 'none' }}>
+                            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', transition: 'transform 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'} title="Go to Dashboard">
                                 {user.profilePicture ? (
-                                    <img src={user.profilePicture} alt={user.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                                    <img src={user.profilePicture} alt="Profile" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.1)' }} />
                                 ) : (
-                                    <Avatar name={user.name || 'User'} size="40px" fontSize="0.9rem" />
+                                    <Avatar name={user.name} size="40px" fontSize="0.9rem" />
                                 )}
                             </div>
                         </Link>
-
-                        {/* Logout */}
-                        <button
-                            onClick={handleLogout}
-                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', fontSize: '0.9rem' }}
-                            title="Logout"
-                        >
-                            <FaSignOutAlt />
-                        </button>
                     </>
                 ) : (
-                    <>
-                        {/* Guest State */}
-                        <Link to="/login" style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: '600', fontSize: '0.85rem' }}>Login</Link>
-
-                    </>
+                    <Link to="/login">
+                        <button className="new-btn" style={{ padding: '0.6rem 1.2rem' }}>
+                            Login
+                        </button>
+                    </Link>
                 )}
             </div>
         </nav>

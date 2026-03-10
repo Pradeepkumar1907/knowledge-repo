@@ -5,6 +5,10 @@ const knowledgeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+        required: true
+    },
     category: {
         type: String,
         required: true
@@ -13,26 +17,55 @@ const knowledgeSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    image: {
+        type: String,
+        default: ''
+    },
     author: {
-        type: String, // Storing username of the author (Admin)
-        default: 'Admin'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     createdAt: {
         type: Date,
         default: Date.now
     },
     likes: {
-        type: [String], // Array of usernames who liked
+        type: [String], // Array of usernames/IDs to track who liked
         default: []
     },
-    comments: {
-        type: [{
-            user: String,
-            text: String,
-            date: { type: Date, default: Date.now }
-        }],
+    views: {
+        type: Number,
+        default: 0
+    },
+    viewedBy: {
+        type: [String],
         default: []
-    }
+    },
+    bookmarkedBy: {
+        type: [String],
+        default: []
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
+    comments: [
+        {
+            user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            text: String,
+            likes: { type: [String], default: [] },
+            date: { type: Date, default: Date.now },
+            replies: [
+                {
+                    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+                    text: String,
+                    likes: { type: [String], default: [] },
+                    date: { type: Date, default: Date.now }
+                }
+            ]
+        }
+    ]
 });
 
 module.exports = mongoose.model('Knowledge', knowledgeSchema);
