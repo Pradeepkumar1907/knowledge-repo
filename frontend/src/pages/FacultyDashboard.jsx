@@ -30,7 +30,7 @@ const FacultyDashboard = () => {
         try {
             const token = localStorage.getItem('token');
 
-            const res = await axios.get(`${API}/auth/me`, {
+            axios.get(`${API}/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
