@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState } from 'react';
 import Avatar from '../Avatar';
 import axios from 'axios';
@@ -11,7 +13,7 @@ const ConversationList = ({ conversations, onSelect, selectedId, onlineUsers }) 
         const fetchFollowing = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5000/api/users/following', {
+                const res = await axios.get(`${API}/api/users/following`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setFollowing(res.data);
@@ -28,7 +30,7 @@ const ConversationList = ({ conversations, onSelect, selectedId, onlineUsers }) 
         if (value.length > 2) {
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get(`http://localhost:5000/api/chat/users?search=${value}`, {
+                const res = await axios.get(`${API}/api/chat/users?search=${value}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setSearchResults(res.data);
@@ -43,7 +45,7 @@ const ConversationList = ({ conversations, onSelect, selectedId, onlineUsers }) 
     const startConversation = async (userId) => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post('http://localhost:5000/api/chat/conversation', { participantId: userId }, {
+            const res = await axios.post(`${API}/api/chat/conversation`, { participantId: userId }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             onSelect(res.data);

@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Avatar from '../components/Avatar';
@@ -49,7 +51,7 @@ const PublicProfile = () => {
             const isId = /^[0-9a-fA-F]{24}$/.test(cleanUsername);
 
             if (isId) {
-                const profileUrl = `http://localhost:5000/api/users/profile/${cleanUsername}`;
+                const profileUrl = `${API}/api/users/profile/${cleanUsername}`;
                 console.log(`[DEBUG] Attempting direct ID lookup: ${profileUrl}`);
                 try {
                     const profileRes = await axios.get(profileUrl, authConfig);
@@ -62,7 +64,7 @@ const PublicProfile = () => {
 
             // 2. Fallback: Search by name/email (or ID if previous failed)
             if (!targetUser) {
-                const searchUrl = `http://localhost:5000/api/users/search?q=${cleanUsername}`;
+                const searchUrl = `${API}/api/users/search?q=${cleanUsername}`;
                 console.log(`[DEBUG] Attempting fallback search: ${searchUrl}`);
                 try {
                     const searchRes = await axios.get(searchUrl, authConfig);
@@ -75,7 +77,7 @@ const PublicProfile = () => {
 
                     if (resolved && resolved._id) {
                         console.log(`[DEBUG] Search resolved to user: ${resolved._id}. Fetching full profile stats.`);
-                        const profileRes = await axios.get(`http://localhost:5000/api/users/profile/${resolved._id}`, authConfig);
+                        const profileRes = await axios.get(`${API}/api/users/profile/${resolved._id}`, authConfig);
                         targetUser = profileRes.data;
                     }
                 } catch (e) {
@@ -90,7 +92,7 @@ const PublicProfile = () => {
                 setIsFollowing(targetUser.isFollowing || false);
 
                 // 3. Knowledge Feed Logic
-                const articlesRes = await axios.get('http://localhost:5000/knowledge/all');
+                const articlesRes = await axios.get(`${API}/knowledge/all`);
                 const tId = targetUser.id || targetUser._id;
                 console.log(`[DEBUG] Fetching articles for author ID: ${tId}`);
                 const items = articlesRes.data.filter(item => {
@@ -129,10 +131,10 @@ const PublicProfile = () => {
             const authConfig = { headers: { Authorization: `Bearer ${token}` } };
 
             if (isFollowing) {
-                await axios.post(`http://localhost:5000/api/users/unfollow/${profileUser.id}`, {}, authConfig);
+                await axios.post(`${API}/api/users/unfollow/${profileUser.id}`, {}, authConfig);
                 setFollowersCount(prev => prev - 1);
             } else {
-                await axios.post(`http://localhost:5000/api/users/follow/${profileUser.id}`, {}, authConfig);
+                await axios.post(`${API}/api/users/follow/${profileUser.id}`, {}, authConfig);
                 setFollowersCount(prev => prev + 1);
             }
             setIsFollowing(!isFollowing);
@@ -148,7 +150,7 @@ const PublicProfile = () => {
         try {
             const token = localStorage.getItem('token');
             const authConfig = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.post('http://localhost:5000/api/chat/conversation', { participantId: profileUser.id }, authConfig);
+            await axios.post(`${API}/api/chat/conversation`, { participantId: profileUser.id }, authConfig);
             navigate('/chat');
         } catch (err) {
             console.error("Error starting conversation", err);

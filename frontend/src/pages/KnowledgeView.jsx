@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link, useNavigate } from 'react-router-dom';
@@ -32,7 +34,7 @@ const KnowledgeView = () => {
 
     const fetchItem = async (currentUser) => {
         try {
-            const res = await axios.get(`http://localhost:5000/knowledge/${id}`);
+            const res = await axios.get(`${API}/knowledge/${id}`);
             setItem(res.data);
             setLoading(false);
 
@@ -54,10 +56,10 @@ const KnowledgeView = () => {
                     localStorage.setItem('guestId', identifier);
                 }
             }
-            await axios.post(`http://localhost:5000/knowledge/${id}/view`, { userId: identifier }).catch(e => console.error("View increment failed", e));
+            await axios.post(`${API}/knowledge/${id}/view`, { userId: identifier }).catch(e => console.error("View increment failed", e));
 
             // Fetch trending
-            const trendRes = await axios.get('http://localhost:5000/knowledge/trending');
+            const trendRes = await axios.get(`${API}/knowledge/trending`);
             setTrending(trendRes.data.filter(t => t._id !== id).slice(0, 4));
 
             // Record visit
@@ -65,7 +67,7 @@ const KnowledgeView = () => {
                 const token = localStorage.getItem('token');
                 if (token) {
                     await axios.post(
-                        `http://localhost:5000/user/visit`,
+                        `${API}/user/visit`,
                         { articleId: id },
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
@@ -103,7 +105,7 @@ const KnowledgeView = () => {
         if (!user) return toast.error("Please login to like posts");
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.put(`http://localhost:5000/knowledge/like/${id}`, {}, {
+            const res = await axios.put(`${API}/knowledge/like/${id}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -129,7 +131,7 @@ const KnowledgeView = () => {
 
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.post(`http://localhost:5000/knowledge/comment/${id}`,
+            const res = await axios.post(`${API}/knowledge/comment/${id}`,
                 { text: commentText },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -149,7 +151,7 @@ const KnowledgeView = () => {
 
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.post(`http://localhost:5000/knowledge/comment/${id}/reply/${commentId}`,
+            const res = await axios.post(`${API}/knowledge/comment/${id}/reply/${commentId}`,
                 { text: replyText },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -167,7 +169,7 @@ const KnowledgeView = () => {
         if (!user) return toast.error("Please login to like comments");
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.put(`http://localhost:5000/knowledge/comment/${id}/like/${commentId}`, {}, {
+            const res = await axios.put(`${API}/knowledge/comment/${id}/like/${commentId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setItem(res.data);
@@ -181,7 +183,7 @@ const KnowledgeView = () => {
         if (!window.confirm("Are you sure you want to delete this article?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/knowledge/delete/${id}`, {
+            await axios.delete(`${API}/knowledge/delete/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success("Deleted successfully");
@@ -201,7 +203,7 @@ const KnowledgeView = () => {
         if (!user) return toast.error("Please login to save articles");
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.put(`http://localhost:5000/knowledge/${id}/bookmark`, {}, {
+            const res = await axios.put(`${API}/knowledge/${id}/bookmark`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const uid = user._id || user.id || user.userId;
@@ -217,7 +219,7 @@ const KnowledgeView = () => {
         if (!window.confirm("Delete this comment?")) return;
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.delete(`http://localhost:5000/knowledge/comment/${id}/${commentId}`, {
+            const res = await axios.delete(`${API}/knowledge/comment/${id}/${commentId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setItem(res.data);
@@ -232,7 +234,7 @@ const KnowledgeView = () => {
         if (!window.confirm("Delete this reply?")) return;
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.delete(`http://localhost:5000/knowledge/comment/${id}/reply/${commentId}/${replyId}`, {
+            const res = await axios.delete(`${API}/knowledge/comment/${id}/reply/${commentId}/${replyId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setItem(res.data);

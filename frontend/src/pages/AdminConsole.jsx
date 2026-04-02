@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -52,7 +54,7 @@ const AdminConsole = () => {
     const fetchStats = async () => {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/knowledge/admin/stats', {
+            const res = await axios.get(`${API}/knowledge/admin/stats`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDashboardStats(res.data);
@@ -64,7 +66,7 @@ const AdminConsole = () => {
     const fetchArticles = async () => {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/knowledge/admin/articles?limit=50`, {
+            const res = await axios.get(`${API}/knowledge/admin/articles?limit=50`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setArticles(res.data.articles || []);
@@ -77,7 +79,7 @@ const AdminConsole = () => {
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/knowledge/admin/users?limit=50`, {
+            const res = await axios.get(`${API}/knowledge/admin/users?limit=50`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(res.data.users || []);
@@ -91,7 +93,7 @@ const AdminConsole = () => {
         if (window.confirm("Are you sure you want to permanently delete this article?")) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`http://localhost:5000/knowledge/delete/${id}`, {
+                await axios.delete(`${API}/knowledge/delete/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success("Article deleted");

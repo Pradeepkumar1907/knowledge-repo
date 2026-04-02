@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -51,12 +53,12 @@ const Home = () => {
         try {
             setLoading(true);
             const [allRes, featuredRes, trendingTodayRes, trendingWeekRes, statsRes, catsRes] = await Promise.all([
-                axios.get('http://localhost:5000/knowledge/all'),
-                axios.get('http://localhost:5000/knowledge/featured'),
-                axios.get('http://localhost:5000/knowledge/trending?timeframe=today'),
-                axios.get('http://localhost:5000/knowledge/trending?timeframe=week'),
-                axios.get('http://localhost:5000/knowledge/stats'),
-                axios.get('http://localhost:5000/knowledge/categories')
+                axios.get(`${API}/knowledge/all`),
+                axios.get(`${API}/knowledge/featured`),
+                axios.get(`${API}/knowledge/trending?timeframe=today`),
+                axios.get(`${API}/knowledge/trending?timeframe=week`),
+                axios.get(`${API}/knowledge/stats`),
+                axios.get(`${API}/knowledge/categories`)
             ]);
 
             setArticles(allRes.data);

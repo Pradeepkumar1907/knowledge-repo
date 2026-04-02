@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +41,7 @@ const StudentDashboard = () => {
 
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5000/me', {
+                const res = await axios.get(`${API}/me`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

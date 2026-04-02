@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -48,7 +50,7 @@ const Search = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/knowledge/categories');
+                const res = await axios.get(`${API}/knowledge/categories`);
                 setCategories(['All', ...res.data]);
             } catch (err) {
                 console.error("Failed to fetch categories");
@@ -80,7 +82,7 @@ const Search = () => {
                 if (minViews) params.append('minViews', minViews);
                 if (sortBy) params.append('sortBy', sortBy);
 
-                const res = await axios.get(`http://localhost:5000/knowledge/search?${params.toString()}`);
+                const res = await axios.get(`${API}/knowledge/search?${params.toString()}`);
                 setResults(res.data);
             } else {
                 // People Search
@@ -89,7 +91,7 @@ const Search = () => {
                     setLoading(false);
                     return;
                 }
-                const res = await axios.get(`http://localhost:5000/api/users/search?q=${searchTerm}`, authConfig);
+                const res = await axios.get(`${API}/api/users/search?q=${searchTerm}`, authConfig);
                 setUserResults(res.data);
             }
         } catch (err) {
@@ -107,7 +109,7 @@ const Search = () => {
             const token = localStorage.getItem('token');
             const authConfig = { headers: { Authorization: `Bearer ${token}` } };
             const isFollowing = targetUser.isFollowing;
-            const url = `http://localhost:5000/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
+            const url = `${API}/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
 
             await axios.post(url, {}, authConfig);
 

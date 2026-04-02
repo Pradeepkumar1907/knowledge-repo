@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBell, FaCheckDouble } from 'react-icons/fa';
@@ -18,7 +20,7 @@ const NotificationDropdown = ({ user }) => {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token')
             if (!token) return;
-            const res = await axios.get('http://localhost:5000/notifications', {
+            const res = await axios.get(`${API}/notifications`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(res.data);
@@ -30,7 +32,7 @@ const NotificationDropdown = ({ user }) => {
     const markAsRead = async (id, articleId) => {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            await axios.put(`http://localhost:5000/notifications/${id}/read`, {}, {
+            await axios.put(`${API}/notifications/${id}/read`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
@@ -44,7 +46,7 @@ const NotificationDropdown = ({ user }) => {
     const markAllRead = async () => {
         try {
             const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            await axios.put(`http://localhost:5000/notifications/read-all`, {}, {
+            await axios.put(`${API}/notifications/read-all`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));

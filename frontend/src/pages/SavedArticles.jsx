@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +21,7 @@ const SavedArticles = () => {
         const fetchBookmarks = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5000/knowledge/user/bookmarks', {
+                const res = await axios.get(`${API}/knowledge/user/bookmarks`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setArticles(res.data);

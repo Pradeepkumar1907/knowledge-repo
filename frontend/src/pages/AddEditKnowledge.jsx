@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -26,7 +28,7 @@ const AddEditKnowledge = () => {
 
     useEffect(() => {
         // Fetch dynamic categories
-        axios.get('http://localhost:5000/categories')
+        axios.get(`${API}/categories`)
             .then(res => {
                 setCategories(res.data);
                 if (!isEditMode && res.data.length > 0 && formData.category === 'General') {
@@ -46,7 +48,7 @@ const AddEditKnowledge = () => {
         }
 
         if (isEditMode) {
-            axios.get(`http://localhost:5000/knowledge/${id}`)
+            axios.get(`${API}/knowledge/${id}`)
                 .then(res => {
                     // Populate form, gracefully handling if author is populated object or string ID
                     const data = res.data;
@@ -107,7 +109,7 @@ const AddEditKnowledge = () => {
 
                 toast.loading("Uploading cover image...", { id: "upload-toast" });
                 try {
-                    const uploadRes = await axios.post('http://localhost:5000/api/upload', uploadData, {
+                    const uploadRes = await axios.post(`${API}/api/upload`, uploadData, {
                         headers: { ...headers, 'Content-Type': 'multipart/form-data' }
                     });
                     imageUrl = uploadRes.data.imageUrl;
@@ -126,10 +128,10 @@ const AddEditKnowledge = () => {
             if (isEditMode) {
                 // Important: Mongoose expects an ObjectId for the author field, not the string name.
                 const updatePayload = { ...payload, author: authorId || formData.author };
-                await axios.put(`http://localhost:5000/knowledge/update/${id}`, updatePayload, { headers });
+                await axios.put(`${API}/knowledge/update/${id}`, updatePayload, { headers });
                 toast.success("Article updated successfully!");
             } else {
-                await axios.post('http://localhost:5000/knowledge/add', payload, { headers });
+                await axios.post(`${API}/knowledge/add`, payload, { headers });
                 localStorage.removeItem('article_draft');
                 if (selectedFile) {
                     toast.success(`Article published with cover image!`);

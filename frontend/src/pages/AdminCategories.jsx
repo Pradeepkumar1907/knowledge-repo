@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -47,7 +49,7 @@ const AdminCategories = () => {
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const res = await axios.get('http://localhost:5000/categories');
+            const res = await axios.get(`${API}/categories`);
             setCategories(res.data);
         } catch (err) {
             console.error("Error fetching categories:", err);
@@ -63,13 +65,13 @@ const AdminCategories = () => {
 
         try {
             if (isEditing) {
-                await axios.put(`http://localhost:5000/categories/${editId}`,
+                await axios.put(`${API}/categories/${editId}`,
                     { name, description },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 toast.success("Category updated!");
             } else {
-                await axios.post('http://localhost:5000/categories',
+                await axios.post(`${API}/categories`,
                     { name, description },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -95,7 +97,7 @@ const AdminCategories = () => {
         if (window.confirm("Are you sure? Articles in this category will remain but might lose their classification.")) {
             try {
                 const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                await axios.delete(`http://localhost:5000/categories/${id}`, {
+                await axios.delete(`${API}/categories/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success("Category removed");

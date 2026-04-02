@@ -1,3 +1,5 @@
+
+const API = import.meta.env.VITE_API_URL;
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -40,7 +42,7 @@ const FollowList = () => {
                 return;
             }
 
-            const url = `http://localhost:5000/api/users/${type}${userId ? `/${userId}` : ''}?page=${pageNum}&limit=20`;
+            const url = `${API}/api/users/${type}${userId ? `/${userId}` : ''}?page=${pageNum}&limit=20`;
             const res = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -69,7 +71,7 @@ const FollowList = () => {
         try {
             const token = localStorage.getItem('token');
             const isFollowing = targetUser.isFollowing;
-            const url = `http://localhost:5000/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
+            const url = `${API}/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
             await axios.post(url, {}, { headers: { Authorization: `Bearer ${token}` } });
 
             setUsers(prev => prev.map(u =>
