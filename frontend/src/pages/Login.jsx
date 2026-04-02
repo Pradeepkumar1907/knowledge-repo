@@ -4,6 +4,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FaBook, FaCheckCircle } from 'react-icons/fa';
 
+const API = import.meta.env.VITE_API_URL;
+
 const Login = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +19,11 @@ const Login = () => {
             callback: async (response) => {
                 setIsLoading(true);
                 try {
-                    const res = await axios.post('http://localhost:5000/auth/google', { idToken: response.credential });
+                    // ✅ FIXED API URL
+                    const res = await axios.post(`${API}/auth/google`, {
+                        idToken: response.credential
+                    });
+
                     if (res.data.roleRequired) {
                         localStorage.setItem('token', res.data.token);
                         navigate('/select-role');
@@ -31,6 +37,7 @@ const Login = () => {
                         }
 
                         toast.success("Login Successful!");
+
                         if (res.data.user.role === 'student') {
                             navigate('/student-dashboard');
                         } else if (res.data.user.role === 'faculty') {
@@ -53,14 +60,15 @@ const Login = () => {
                 size: 'large',
                 shape: 'pill',
                 text: 'signin_with',
-                width: 250 // Custom width for modern look
+                width: 250
             });
         }
     }, [navigate]);
 
     return (
         <div className="login-container">
-            {/* Left Brand Section */}
+            
+            {/* Left Section */}
             <div className="login-brand-section">
                 <div className="brand-content">
                     <div className="brand-logo-large">
@@ -76,37 +84,40 @@ const Login = () => {
 
                     <div className="feature-list">
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
+                            <FaCheckCircle style={{ color: '#60a5fa' }} />
                             <span>Structured Learning Resources</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
+                            <FaCheckCircle style={{ color: '#60a5fa' }} />
                             <span>Faculty Verified Content</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
+                            <FaCheckCircle style={{ color: '#60a5fa' }} />
                             <span>Smart Search & Categorization</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
+                            <FaCheckCircle style={{ color: '#60a5fa' }} />
                             <span>Collaborative Knowledge Sharing</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Right Login Section */}
+            {/* Right Section */}
             <div className="login-form-section">
                 <div className="login-card-modern">
                     <h2 className="login-card-title">Welcome Back</h2>
-                    <p className="login-card-subtitle">Sign in to continue to your dashboard</p>
+                    <p className="login-card-subtitle">
+                        Sign in to continue to your dashboard
+                    </p>
 
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem', minHeight: '48px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
                         <div style={{ display: isLoading ? 'none' : 'block' }}>
                             <div className="google-btn-wrapper">
                                 <div id="googleSignInBtn"></div>
                             </div>
                         </div>
+
                         {isLoading && (
                             <div className="auth-loading-btn" style={{ width: '250px' }}>
                                 <div className="spinner"></div>
@@ -114,14 +125,8 @@ const Login = () => {
                             </div>
                         )}
                     </div>
-
-                    {/* <div className="login-divider">OR</div> */}
-
-                    {/* <button className="login-btn-outline" disabled>
-                        Continue with Phone (Coming Soon)
-                    </button> */}
                 </div>
-                
+
                 <div className="login-footer">
                     <div>&copy; 2026 KnowledgeRepo</div>
                     <div className="login-footer-links">
