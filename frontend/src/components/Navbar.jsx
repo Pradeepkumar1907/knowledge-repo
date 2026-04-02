@@ -60,7 +60,7 @@ const Navbar = () => {
             <div className="nav-center">
                 <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Explore</Link>
                 {!isAdmin && <Link to="/categories" className={`nav-link ${location.pathname === '/categories' ? 'active' : ''}`}>Categories</Link>}
-                {user && !isAdmin && <Link to={getDashboardPath()} className={`nav-link ${location.pathname === getDashboardPath() ? 'active' : ''}`}>My Learning</Link>}
+                {/* {user && !isAdmin && <Link to={getDashboardPath()} className={`nav-link ${location.pathname === getDashboardPath() ? 'active' : ''}`}>My Learning</Link>} */}
             </div>
 
             {/* Right: Actions */}

@@ -1,5 +1,0 @@
-USERS IN DB:
-698da5265369e1f20aa182e8 - Pradeep (admin)
-698ec60ac75040ca47bb2e42 - PRADEEP KUMAR V (faculty)
-698ec818c75040ca47bb2e62 - PRASAANTH M (student)
-698ecabcc75040ca47bb2ea0 - Prashanth (faculty)

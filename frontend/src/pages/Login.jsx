@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -6,6 +6,7 @@ import { FaBook, FaCheckCircle } from 'react-icons/fa';
 
 const Login = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -14,6 +15,7 @@ const Login = () => {
         window.google.accounts.id.initialize({
             client_id: clientId,
             callback: async (response) => {
+                setIsLoading(true);
                 try {
                     const res = await axios.post('http://localhost:5000/auth/google', { idToken: response.credential });
                     if (res.data.roleRequired) {
@@ -38,6 +40,7 @@ const Login = () => {
                         }
                     }
                 } catch (err) {
+                    setIsLoading(false);
                     toast.error(err.response?.data?.error || 'Google sign-in failed');
                 }
             }
@@ -61,7 +64,7 @@ const Login = () => {
             <div className="login-brand-section">
                 <div className="brand-content">
                     <div className="brand-logo-large">
-                        <div style={{ background: 'var(--accent-primary)', padding: '10px', borderRadius: '12px', display: 'flex' }}>
+                        <div className="brand-logo-icon-wrap">
                             <FaBook style={{ color: '#fff' }} />
                         </div>
                         KnowledgeRepo
@@ -73,16 +76,20 @@ const Login = () => {
 
                     <div className="feature-list">
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: 'var(--accent-primary)' }} />
+                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
                             <span>Structured Learning Resources</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: 'var(--accent-primary)' }} />
+                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
                             <span>Faculty Verified Content</span>
                         </div>
                         <div className="feature-item">
-                            <FaCheckCircle style={{ color: 'var(--accent-primary)' }} />
+                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
                             <span>Smart Search & Categorization</span>
+                        </div>
+                        <div className="feature-item">
+                            <FaCheckCircle style={{ color: '#60a5fa', fontSize: '1.2rem', flexShrink: 0 }} />
+                            <span>Collaborative Knowledge Sharing</span>
                         </div>
                     </div>
                 </div>
@@ -91,22 +98,39 @@ const Login = () => {
             {/* Right Login Section */}
             <div className="login-form-section">
                 <div className="login-card-modern">
-                    <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>Welcome Back</h2>
-                    <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Sign in to continue to your dashboard</p>
+                    <h2 className="login-card-title">Welcome Back</h2>
+                    <p className="login-card-subtitle">Sign in to continue to your dashboard</p>
 
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                        <div id="googleSignInBtn"></div>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem', minHeight: '48px' }}>
+                        <div style={{ display: isLoading ? 'none' : 'block' }}>
+                            <div className="google-btn-wrapper">
+                                <div id="googleSignInBtn"></div>
+                            </div>
+                        </div>
+                        {isLoading && (
+                            <div className="auth-loading-btn" style={{ width: '250px' }}>
+                                <div className="spinner"></div>
+                                Signing you in...
+                            </div>
+                        )}
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '1.5rem 0' }}>
-                        <span style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></span>
-                        <span>OR</span>
-                        <span style={{ flex: 1, height: '1px', background: 'var(--border-color)' }}></span>
-                    </div>
+                    {/* <div className="login-divider">OR</div> */}
 
-                    <button className="btn-primary" disabled style={{ width: '100%', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                    {/* <button className="login-btn-outline" disabled>
                         Continue with Phone (Coming Soon)
-                    </button>
+                    </button> */}
+                </div>
+                
+                <div className="login-footer">
+                    <div>&copy; 2026 KnowledgeRepo</div>
+                    <div className="login-footer-links">
+                        <a href="#terms">Terms</a>
+                        <span>&bull;</span>
+                        <a href="#privacy">Privacy</a>
+                        <span>&bull;</span>
+                        <a href="#contact">Contact</a>
+                    </div>
                 </div>
             </div>
         </div>

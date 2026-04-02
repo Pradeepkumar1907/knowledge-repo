@@ -94,25 +94,28 @@ const TopBar = ({ user, onSearch, searchTerm }) => {
                     <FaHome /> Home
                 </button>
 
-                <button
-                    className="new-btn"
-                    onClick={() => navigate('/add')}
-                    style={{
-                        background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                        color: 'white',
-                        padding: '0.6rem 1rem',
-                        borderRadius: '50px',
-                        fontWeight: '600',
-                        fontSize: '0.8rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        boxShadow: '0 4px 10px rgba(37, 99, 235, 0.3)',
-                        transition: 'transform 0.2s'
-                    }}
-                >
-                    <FaPlus /> New Article
-                </button>
+                {(user?.role === "admin" || user?.role === "faculty") && (
+                    <button
+                        className="new-btn"
+                        onClick={() => navigate('/add')}
+                        style={{
+                            background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                            color: 'white',
+                            padding: '0.6rem 1rem',
+                            borderRadius: '50px',
+                            fontWeight: '600',
+                            fontSize: '0.8rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            boxShadow: '0 4px 10px rgba(37, 99, 235, 0.3)',
+                            transition: 'transform 0.2s'
+                        }}
+                    >
+                        <FaPlus /> New Article
+                    </button>
+                )}
+
 
                 <button
                     onClick={() => navigate('/chat')}
