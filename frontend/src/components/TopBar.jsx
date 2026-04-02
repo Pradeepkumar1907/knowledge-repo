@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { FaSearch, FaBell, FaPlus, FaChevronDown, FaHome, FaCheckDouble, FaComments } from 'react-icons/fa';
-
+import React, { useState } from 'react';
+import { FaSearch, FaPlus, FaChevronDown, FaHome, FaComments } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Avatar from './Avatar';
 import NotificationDropdown from './NotificationDropdown';
 
@@ -82,14 +80,6 @@ const TopBar = ({ user, onSearch, searchTerm }) => {
                         transition: 'all 0.2s',
                         cursor: 'pointer'
                     }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--bg-card-hover)';
-                        e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'var(--bg-secondary)';
-                        e.currentTarget.style.borderColor = 'var(--border-color)';
-                    }}
                 >
                     <FaHome /> Home
                 </button>
@@ -133,14 +123,6 @@ const TopBar = ({ user, onSearch, searchTerm }) => {
                         transition: 'all 0.2s',
                         position: 'relative'
                     }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--accent-primary)';
-                        e.currentTarget.style.color = 'var(--accent-primary)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'var(--border-color)';
-                        e.currentTarget.style.color = 'var(--text-primary)';
-                    }}
                 >
                     <FaComments />
                 </button>
@@ -157,7 +139,6 @@ const TopBar = ({ user, onSearch, searchTerm }) => {
                         if (userId) {
                             navigate(`/profile/${userId}`);
                         } else {
-                            // Fallback to dashboard if ID is somehow missing
                             if (user?.role === 'admin') navigate('/admin');
                             else if (user?.role === 'faculty') navigate('/faculty-dashboard');
                             else navigate('/student-dashboard');

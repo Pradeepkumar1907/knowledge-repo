@@ -1,7 +1,5 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSearch, FaFilter, FaLayerGroup, FaUser, FaEye, FaCalendarAlt } from 'react-icons/fa';
 import ArticleCard from '../components/ArticleCard';
@@ -50,7 +48,8 @@ const Search = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axios.get(`${API}/knowledge/categories`);
+                // ✅ USE CENTRALIZED API INSTANCE
+                const res = await API.get('/knowledge/categories');
                 setCategories(['All', ...res.data]);
             } catch (err) {
                 console.error("Failed to fetch categories");
@@ -71,9 +70,6 @@ const Search = () => {
         setCurrentPage(1);
 
         try {
-            const token = localStorage.getItem('token');
-            const authConfig = { headers: { Authorization: `Bearer ${token}` } };
-
             if (searchType === 'articles') {
                 const params = new URLSearchParams();
                 if (searchTerm) params.append('q', searchTerm);
@@ -82,7 +78,8 @@ const Search = () => {
                 if (minViews) params.append('minViews', minViews);
                 if (sortBy) params.append('sortBy', sortBy);
 
-                const res = await axios.get(`${API}/knowledge/search?${params.toString()}`);
+                // ✅ USE CENTRALIZED API INSTANCE
+                const res = await API.get(`/knowledge/search?${params.toString()}`);
                 setResults(res.data);
             } else {
                 // People Search
@@ -91,7 +88,8 @@ const Search = () => {
                     setLoading(false);
                     return;
                 }
-                const res = await axios.get(`${API}/api/users/search?q=${searchTerm}`, authConfig);
+                // ✅ USE CENTRALIZED API INSTANCE
+                const res = await API.get(`/api/users/search?q=${searchTerm}`);
                 setUserResults(res.data);
             }
         } catch (err) {
@@ -106,12 +104,11 @@ const Search = () => {
         if (!currentUser) return navigate('/login');
 
         try {
-            const token = localStorage.getItem('token');
-            const authConfig = { headers: { Authorization: `Bearer ${token}` } };
             const isFollowing = targetUser.isFollowing;
-            const url = `${API}/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
+            const url = `/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
 
-            await axios.post(url, {}, authConfig);
+            // ✅ USE CENTRALIZED API INSTANCE
+            await API.post(url);
 
             // Update local state
             setUserResults(prev => prev.map(u =>
@@ -351,7 +348,43 @@ const Search = () => {
                                     {/* Pagination Controls */}
                                     {results.length > itemsPerPage && (
                                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem', gap: '0.5rem', flexWrap: 'wrap', paddingBottom: '2rem' }}>
-                                            {/* ... pagination logic stays same ... */}
+                                            {(() => {
+                                                const totalPages = Math.ceil(results.length / itemsPerPage);
+                                                const pageNumbers = [];
+                                                pageNumbers.push(1);
+                                                let startPage = Math.max(2, currentPage - 2);
+                                                let endPage = Math.min(totalPages - 1, currentPage + 2);
+                                                if (currentPage <= 3) endPage = Math.min(totalPages - 1, 5);
+                                                if (currentPage >= totalPages - 2) startPage = Math.max(2, totalPages - 4);
+                                                if (startPage > 2) pageNumbers.push('...');
+                                                for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
+                                                if (endPage < totalPages - 1) pageNumbers.push('...');
+                                                if (totalPages > 1) pageNumbers.push(totalPages);
+
+                                                return pageNumbers.map((number, idx) => (
+                                                    number === '...' ? (
+                                                        <span key={`ellipsis-${idx}`} style={{ display: 'flex', alignItems: 'end', padding: '0 0.5rem', color: '#94a3b8' }}>...</span>
+                                                    ) : (
+                                                        <button
+                                                            key={number}
+                                                            onClick={() => paginate(number)}
+                                                            style={{
+                                                                width: '40px',
+                                                                height: '40px',
+                                                                borderRadius: '8px',
+                                                                background: currentPage === number ? 'var(--accent-primary)' : 'var(--bg-card)',
+                                                                color: currentPage === number ? 'white' : 'var(--text-primary)',
+                                                                border: currentPage === number ? 'none' : '1px solid var(--border-color)',
+                                                                cursor: 'pointer',
+                                                                fontWeight: 'bold',
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                        >
+                                                            {number}
+                                                        </button>
+                                                    )
+                                                ));
+                                            })()}
                                         </div>
                                     )}
                                 </>

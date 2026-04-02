@@ -1,8 +1,6 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { FaUserPlus, FaUserCheck, FaComments, FaArrowLeft, FaSearch } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Avatar from '../components/Avatar';
@@ -35,17 +33,10 @@ const FollowList = () => {
     const fetchUsers = async (pageNum = 1, append = false) => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            if (!token) {
-                toast.error("Authentication required");
-                navigate('/login');
-                return;
-            }
 
-            const url = `${API}/api/users/${type}${userId ? `/${userId}` : ''}?page=${pageNum}&limit=20`;
-            const res = await axios.get(url, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE (Interceptors handle token)
+            const url = `/api/users/${type}${userId ? `/${userId}` : ''}?page=${pageNum}&limit=20`;
+            const res = await API.get(url);
 
             if (append) {
                 setUsers(prev => [...(prev || []), ...(res.data?.users || [])]);
@@ -57,7 +48,12 @@ const FollowList = () => {
             setLoading(false);
         } catch (err) {
             console.error(`Error fetching ${type}:`, err);
-            toast.error(`Failed to load ${type}`);
+            if (err.response?.status === 401) {
+                toast.error("Authentication required");
+                navigate('/login');
+            } else {
+                toast.error(`Failed to load ${type}`);
+            }
             setLoading(false);
         }
     };
@@ -69,16 +65,17 @@ const FollowList = () => {
     const handleToggleFollow = async (e, targetUser) => {
         e.stopPropagation();
         try {
-            const token = localStorage.getItem('token');
             const isFollowing = targetUser.isFollowing;
-            const url = `${API}/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
-            await axios.post(url, {}, { headers: { Authorization: `Bearer ${token}` } });
+            const url = `/api/users/${isFollowing ? 'unfollow' : 'follow'}/${targetUser._id}`;
+            // ✅ USE CENTRALIZED API INSTANCE
+            await API.post(url);
 
             setUsers(prev => prev.map(u =>
                 u._id === targetUser._id ? { ...u, isFollowing: !isFollowing } : u
             ));
         } catch (err) {
             console.error("Error toggling follow:", err);
+            toast.error("Follow action failed");
         }
     };
 
@@ -177,7 +174,7 @@ const FollowList = () => {
                                     </div>
 
                                     <div style={{ display: 'flex', gap: '0.8rem' }}>
-                                        {u._id !== currentUser.id && (
+                                        {u._id !== currentUser.id && u._id !== currentUser._id && (
                                             <>
                                                 <button
                                                     onClick={(e) => handleToggleFollow(e, u)}

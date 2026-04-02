@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaHeart, FaEdit, FaTrash, FaLayerGroup, FaCalendarAlt } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -8,7 +7,7 @@ import TopBar from '../components/TopBar';
 import StatCard from '../components/StatCard';
 import Analytics from '../components/Analytics';
 
-// ✅ USE ENV VARIABLE
+// ✅ USE CENTRALIZED API INSTANCE
 import API from '../api';
 
 const FacultyDashboard = () => {
@@ -28,11 +27,8 @@ const FacultyDashboard = () => {
     // ✅ FETCH USER
     const fetchUserData = async () => {
         try {
-            const token = localStorage.getItem('token');
-
-            const res = await axios.get(`${API}/auth/me`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/auth/me');
 
             setUser(res.data);
             sessionStorage.setItem('user', JSON.stringify(res.data));
@@ -46,11 +42,8 @@ const FacultyDashboard = () => {
     // ✅ FETCH STATS
     const fetchStats = async () => {
         try {
-            const token = localStorage.getItem('token');
-
-            const res = await axios.get(`${API}/knowledge/faculty/stats`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/knowledge/faculty/stats');
 
             setDashboardStats(res.data);
         } catch (err) {
@@ -61,7 +54,8 @@ const FacultyDashboard = () => {
     // ✅ FETCH ARTICLES
     const fetchArticles = async () => {
         try {
-            const res = await axios.get(`${API}/knowledge/all`);
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/knowledge/all');
             setArticles(res.data);
         } catch (err) {
             toast.error("Failed to fetch content");
@@ -71,11 +65,8 @@ const FacultyDashboard = () => {
     // ✅ DELETE
     const handleDelete = async (id) => {
         try {
-            const token = localStorage.getItem('token');
-
-            await axios.delete(`${API}/knowledge/delete/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            await API.delete(`/knowledge/delete/${id}`);
 
             toast.success("Deleted");
             fetchArticles();

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FaBook, FaCheckCircle } from 'react-icons/fa';
 
@@ -19,8 +18,8 @@ const Login = () => {
             callback: async (response) => {
                 setIsLoading(true);
                 try {
-                    // ✅ FIXED API URL
-                    const res = await axios.post(`${API}/auth/google`, {
+                    // ✅ USE CENTRALIZED API INSTANCE
+                    const res = await API.post('/auth/google', {
                         idToken: response.credential
                     });
 
@@ -29,7 +28,6 @@ const Login = () => {
                         navigate('/select-role');
                     } else {
                         localStorage.setItem('token', res.data.token);
-                        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
                         sessionStorage.setItem('user', JSON.stringify(res.data.user));
 
                         if (res.data.user.role) {

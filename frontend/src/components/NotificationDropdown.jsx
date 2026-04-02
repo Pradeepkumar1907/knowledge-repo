@@ -1,9 +1,7 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaBell, FaCheckDouble } from 'react-icons/fa';
-import axios from 'axios';
 
 const NotificationDropdown = ({ user }) => {
     const navigate = useNavigate();
@@ -18,11 +16,8 @@ const NotificationDropdown = ({ user }) => {
 
     const fetchNotifications = async () => {
         try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token')
-            if (!token) return;
-            const res = await axios.get(`${API}/notifications`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE (Interceptors handle token)
+            const res = await API.get('/notifications');
             setNotifications(res.data);
         } catch (err) {
             console.error("Error fetching notifications", err);
@@ -31,10 +26,8 @@ const NotificationDropdown = ({ user }) => {
 
     const markAsRead = async (id, articleId) => {
         try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            await axios.put(`${API}/notifications/${id}/read`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            await API.put(`/notifications/${id}/read`);
             setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n));
             setShowDropdown(false);
             if (articleId) navigate(`/view/${articleId}`);
@@ -45,10 +38,8 @@ const NotificationDropdown = ({ user }) => {
 
     const markAllRead = async () => {
         try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            await axios.put(`${API}/notifications/read-all`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            await API.put('/notifications/read-all');
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));
         } catch (err) {
             console.error(err);
@@ -57,7 +48,6 @@ const NotificationDropdown = ({ user }) => {
 
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    // Close dropdown on click outside
     useEffect(() => {
         if (!showDropdown) return;
         const close = () => setShowDropdown(false);
@@ -103,7 +93,7 @@ const NotificationDropdown = ({ user }) => {
                     top: '120%',
                     right: '-10px',
                     width: '320px',
-                    background: 'var(--bg-secondary, #1a202c)',
+                    background: 'var(--bg-secondary)',
                     border: '1px solid var(--border-color)',
                     borderRadius: '12px',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
@@ -111,14 +101,14 @@ const NotificationDropdown = ({ user }) => {
                     overflow: 'hidden',
                     animation: 'slideDown 0.2s ease-out'
                 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--border-color)' }}>
                         <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.95rem' }}>Notifications</h4>
                         {unreadCount > 0 && (
                             <button
                                 onClick={markAllRead}
-                                style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600' }}
+                                style={{ background: 'none', border: 'none', color: 'var(--accent-primary)', fontSize: '0.8rem', cursor: 'pointer', fontWeight: '600' }}
                             >
-                                <FaCheckDouble /> Mark all read
+                                Mark all read
                             </button>
                         )}
                     </div>
@@ -139,10 +129,8 @@ const NotificationDropdown = ({ user }) => {
                                         background: notif.read ? 'transparent' : 'rgba(59, 130, 246, 0.05)',
                                         cursor: 'pointer',
                                         display: 'flex',
-                                        gap: '12px',
-                                        transition: 'background 0.2s'
+                                        gap: '12px'
                                     }}
-                                    className="notification-item"
                                 >
                                     <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: notif.read ? 'transparent' : 'var(--accent-primary)', marginTop: '6px', flexShrink: 0 }}></div>
                                     <div style={{ flex: 1 }}>

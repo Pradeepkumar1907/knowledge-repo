@@ -1,8 +1,6 @@
-
 import API from '../api';
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
-import axios from 'axios';
 import ConversationList from '../components/chat/ConversationList';
 import ChatWindow from '../components/chat/ChatWindow';
 import { useTheme } from '../context/ThemeContext';
@@ -18,11 +16,16 @@ const Chat = () => {
     const { theme } = useTheme();
 
     useEffect(() => {
-        // Initialize socket
-        socket.current = io(`${API}`);
+        // Initialize socket - baseURL from API instance
+        const socketUrl = import.meta.env.VITE_API_URL;
+        if (!socketUrl) {
+            console.warn("VITE_API_URL is missing, socket may not connect in production.");
+        }
+        socket.current = io(socketUrl || 'http://localhost:5000'); // Keep localhost only as an absolute last resort if env is missing
 
-        if (user.id) {
-            socket.current.emit('join', user.id);
+        const userId = user.id || user._id;
+        if (userId) {
+            socket.current.emit('join', userId);
         }
 
         socket.current.on('getOnlineUsers', (users) => {
@@ -40,14 +43,12 @@ const Chat = () => {
         return () => {
             socket.current.disconnect();
         };
-    }, [user.id, selectedConversation?._id]);
+    }, [user.id, user._id, selectedConversation?._id]);
 
     const fetchConversations = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.get(`${API}/api/chat/conversations`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/api/chat/conversations');
             setConversations(res.data);
         } catch (err) {
             console.error('Error fetching conversations:', err);
@@ -60,10 +61,8 @@ const Chat = () => {
 
     const fetchMessages = async (conversationId) => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.get(`${API}/api/chat/messages/${conversationId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get(`/api/chat/messages/${conversationId}`);
             setMessages(res.data);
             socket.current.emit('joinConversation', conversationId);
         } catch (err) {
@@ -80,18 +79,16 @@ const Chat = () => {
         if (!selectedConversation) return;
 
         try {
-            const token = localStorage.getItem('token');
-            const res = await axios.post(`${API}/api/chat/message`, {
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.post('/api/chat/message', {
                 conversationId: selectedConversation._id,
                 text,
                 image
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
 
             const newMessage = {
                 ...res.data,
-                senderId: user.id
+                senderId: user.id || user._id
             };
 
             socket.current.emit('sendMessage', newMessage);

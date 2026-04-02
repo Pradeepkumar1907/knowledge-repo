@@ -8,7 +8,7 @@ const { Server } = require('socket.io');
 
 const app = express();
 app.use(cors({
-  origin: "https://knowledge-repo-rose.vercel.app",
+  origin: true,
   credentials: true
 }));
 const server = http.createServer(app);

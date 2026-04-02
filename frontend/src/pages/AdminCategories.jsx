@@ -1,9 +1,7 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaPlus, FaEdit, FaTrash, FaTag, FaFolderOpen, FaCalendarAlt, FaLayerGroup } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaTag, FaCalendarAlt, FaLayerGroup } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
@@ -39,7 +37,6 @@ const AdminCategories = () => {
         if (storedUser) {
             const u = JSON.parse(storedUser);
             setUser(u);
-            // Allow Student/Faculty to view, but redirect guests to login
         } else {
             navigate('/login');
         }
@@ -49,7 +46,8 @@ const AdminCategories = () => {
     const fetchCategories = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${API}/categories`);
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/categories');
             setCategories(res.data);
         } catch (err) {
             console.error("Error fetching categories:", err);
@@ -61,20 +59,15 @@ const AdminCategories = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
         try {
             if (isEditing) {
-                await axios.put(`${API}/categories/${editId}`,
-                    { name, description },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                // ✅ USE CENTRALIZED API INSTANCE
+                await API.put(`/categories/${editId}`, { name, description });
                 toast.success("Category updated!");
             } else {
-                await axios.post(`${API}/categories`,
-                    { name, description },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                // ✅ USE CENTRALIZED API INSTANCE
+                await API.post('/categories', { name, description });
                 toast.success("Category created!");
             }
 
@@ -96,10 +89,8 @@ const AdminCategories = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure? Articles in this category will remain but might lose their classification.")) {
             try {
-                const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-                await axios.delete(`${API}/categories/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                // ✅ USE CENTRALIZED API INSTANCE
+                await API.delete(`/categories/${id}`);
                 toast.success("Category removed");
                 fetchCategories();
             } catch (err) {
@@ -131,12 +122,11 @@ const AdminCategories = () => {
                 marginLeft: !isManagementView ? '0' : (isMobile ? '0' : (sidebarCollapsed ? '80px' : '260px')),
                 width: !isManagementView ? '100%' : (isMobile ? '100%' : (sidebarCollapsed ? 'calc(100% - 80px)' : 'calc(100% - 260px)')),
                 transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                paddingTop: !isManagementView ? '80px' : '0' // Space for top Navbar
+                paddingTop: !isManagementView ? '80px' : '0'
             }}>
                 {isManagementView && <TopBar user={user} />}
 
                 <main style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-                    {/* Page Header */}
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -158,32 +148,21 @@ const AdminCategories = () => {
                             color: 'var(--accent-primary)',
                             fontSize: '0.9rem',
                             fontWeight: '700',
-                            border: '1px solid var(--accent-primary)30'
+                            border: '1px solid var(--border-color)'
                         }}>
                             {categories.length} Categories
                         </div>
                     </div>
 
-                    {/* Create/Edit Section - Only for Admins */}
                     {isAdmin && (
                         <div style={{
                             background: 'var(--bg-card)',
                             border: '1px solid var(--border-color)',
                             padding: '2rem',
                             borderRadius: '24px',
-                            marginBottom: '3rem',
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+                            marginBottom: '3rem'
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
-                                <div style={{
-                                    background: 'var(--accent-primary)',
-                                    color: 'white',
-                                    padding: '10px',
-                                    borderRadius: '12px',
-                                    display: 'flex'
-                                }}>
-                                    {isEditing ? <FaEdit /> : <FaPlus />}
-                                </div>
                                 <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '700', color: 'var(--text-primary)' }}>
                                     {isEditing ? 'Edit Category' : 'Create New Category'}
                                 </h3>
@@ -206,8 +185,7 @@ const AdminCategories = () => {
                                                 padding: '12px 16px',
                                                 color: 'var(--text-primary)',
                                                 fontSize: '1rem',
-                                                outline: 'none',
-                                                transition: 'border-color 0.2s'
+                                                outline: 'none'
                                             }}
                                         />
                                     </div>
@@ -225,30 +203,13 @@ const AdminCategories = () => {
                                                 padding: '12px 16px',
                                                 color: 'var(--text-primary)',
                                                 fontSize: '1rem',
-                                                outline: 'none',
-                                                transition: 'border-color 0.2s'
+                                                outline: 'none'
                                             }}
                                         />
                                     </div>
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button
-                                        type="submit"
-                                        style={{
-                                            background: 'var(--accent-primary)',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '12px',
-                                            padding: '12px 24px',
-                                            fontWeight: '700',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '10px',
-                                            transition: 'all 0.2s'
-                                        }}
-                                    >
-                                        {isEditing ? <FaEdit /> : <FaPlus />}
+                                    <button type="submit" className="btn-primary" style={{ padding: '12px 24px', borderRadius: '12px' }}>
                                         {isEditing ? 'Update Category' : 'Add Category'}
                                     </button>
                                     {isEditing && (
@@ -261,7 +222,6 @@ const AdminCategories = () => {
                                                 border: '1px solid var(--border-color)',
                                                 borderRadius: '12px',
                                                 padding: '12px 24px',
-                                                fontWeight: '600',
                                                 cursor: 'pointer'
                                             }}
                                         >
@@ -273,11 +233,9 @@ const AdminCategories = () => {
                         </div>
                     )}
 
-                    {/* Active Categories Grid */}
                     <div style={{ marginBottom: '2rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                             <h3 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', color: 'var(--text-primary)' }}>Active Categories</h3>
-                            <div style={{ height: '2px', flex: 1, background: 'linear-gradient(to right, var(--border-color), transparent)' }}></div>
                         </div>
 
                         {loading ? (
@@ -285,16 +243,8 @@ const AdminCategories = () => {
                                 <div style={{ width: '40px', height: '40px', border: '4px solid var(--border-color)', borderTop: '4px solid var(--accent-primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
                             </div>
                         ) : categories.length === 0 ? (
-                            <div style={{
-                                textAlign: 'center',
-                                padding: '5rem 2rem',
-                                background: 'var(--bg-card)',
-                                borderRadius: '32px',
-                                border: '1px dashed var(--border-color)'
-                            }}>
-                                <div style={{ fontSize: '4rem', marginBottom: '1.5rem' }}>📂</div>
-                                <h4 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>No categories created yet.</h4>
-                                <p style={{ color: 'var(--text-secondary)', maxWidth: '400px', margin: '0 auto' }}>Create your first category to organize articles and improve repository structure.</p>
+                            <div style={{ textAlign: 'center', padding: '5rem 2rem' }}>
+                                <p style={{ color: 'var(--text-secondary)' }}>No categories created yet.</p>
                             </div>
                         ) : (
                             <div style={{
@@ -310,7 +260,6 @@ const AdminCategories = () => {
                                             border: '1px solid var(--border-color)',
                                             borderRadius: '24px',
                                             padding: '1.5rem',
-                                            transition: 'all 0.3s ease',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             justifyContent: 'space-between'
@@ -334,43 +283,15 @@ const AdminCategories = () => {
                                                 <div style={{ display: 'flex', gap: '8px' }}>
                                                     {isAdmin && (
                                                         <>
-                                                            <button
-                                                                onClick={() => handleEdit(cat)}
-                                                                style={{
-                                                                    background: 'var(--bg-secondary)',
-                                                                    border: '1px solid var(--border-color)',
-                                                                    color: 'var(--text-primary)',
-                                                                    width: '36px',
-                                                                    height: '36px',
-                                                                    borderRadius: '10px',
-                                                                    cursor: 'pointer'
-                                                                }}
-                                                                title="Edit Category"
-                                                            >
-                                                                <FaEdit size={14} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDelete(cat._id)}
-                                                                style={{
-                                                                    background: 'var(--bg-secondary)',
-                                                                    border: '1px solid var(--border-color)',
-                                                                    color: '#ff4d4d',
-                                                                    width: '36px',
-                                                                    height: '36px',
-                                                                    borderRadius: '10px',
-                                                                    cursor: 'pointer'
-                                                                }}
-                                                                title="Delete Category"
-                                                            >
-                                                                <FaTrash size={14} />
-                                                            </button>
+                                                            <button onClick={() => handleEdit(cat)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', cursor: 'pointer' }}><FaEdit /></button>
+                                                            <button onClick={() => handleDelete(cat._id)} style={{ background: 'none', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}><FaTrash /></button>
                                                         </>
                                                     )}
                                                 </div>
                                             </div>
                                             <h4 style={{ fontSize: '1.25rem', fontWeight: '800', margin: '0 0 8px 0', color: 'var(--text-primary)' }}>{cat.name}</h4>
-                                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', minHeight: '2.7rem' }}>
-                                                {cat.description || 'No description provided for this category.'}
+                                            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                                                {cat.description || 'No description provided.'}
                                             </p>
                                         </div>
 
@@ -388,7 +309,7 @@ const AdminCategories = () => {
                                             </div>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
                                                 <FaCalendarAlt size={12} />
-                                                <span>{new Date(cat.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>
+                                                <span>{new Date(cat.createdAt).toLocaleDateString()}</span>
                                             </div>
                                         </div>
                                     </div>

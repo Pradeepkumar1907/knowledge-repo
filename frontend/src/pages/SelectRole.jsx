@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
 
@@ -20,16 +19,8 @@ const SelectRole = () => {
                 return;
             }
 
-            // ✅ CORRECT API CALL
-            const res = await axios.post(
-                `${API}/auth/set-role`,
-                { role }, // body
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.post('/auth/set-role', { role });
 
             // ✅ Save updated data
             localStorage.setItem('token', res.data.token);

@@ -1,10 +1,8 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Avatar from '../components/Avatar';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FaBook, FaCode, FaGraduationCap, FaComments, FaFlask, FaHistory, FaCalculator, FaGlobe } from 'react-icons/fa';
+import { FaBook, FaCode, FaComments, FaFlask, FaHistory, FaCalculator, FaGlobe } from 'react-icons/fa';
 
 const getIcon = (category) => {
     switch (category) {
@@ -17,7 +15,6 @@ const getIcon = (category) => {
     }
 };
 
-
 const PublicProfile = () => {
     const { username } = useParams();
     const navigate = useNavigate();
@@ -29,9 +26,7 @@ const PublicProfile = () => {
     const [followingCount, setFollowingCount] = useState(0);
     const [isFollowing, setIsFollowing] = useState(false);
 
-
     const currentUser = JSON.parse(sessionStorage.getItem('user'));
-
 
     useEffect(() => {
         fetchProfileData();
@@ -39,11 +34,7 @@ const PublicProfile = () => {
 
     const fetchProfileData = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const authConfig = { headers: { Authorization: `Bearer ${token}` } };
-
             let targetUser = null;
-
             const cleanUsername = username?.trim();
             console.log(`[DEBUG] Resolving profile for: "${cleanUsername}"`);
 
@@ -51,33 +42,28 @@ const PublicProfile = () => {
             const isId = /^[0-9a-fA-F]{24}$/.test(cleanUsername);
 
             if (isId) {
-                const profileUrl = `${API}/api/users/profile/${cleanUsername}`;
-                console.log(`[DEBUG] Attempting direct ID lookup: ${profileUrl}`);
+                const profileUrl = `/api/users/profile/${cleanUsername}`;
                 try {
-                    const profileRes = await axios.get(profileUrl, authConfig);
+                    // ✅ USE CENTRALIZED API INSTANCE
+                    const profileRes = await API.get(profileUrl);
                     targetUser = profileRes.data;
-                    console.log(`[DEBUG] Direct ID lookup SUCCESS`);
                 } catch (e) {
-                    console.warn(`[DEBUG] Direct ID lookup FAILED (Expected if search fallback needed): ${e.response?.status}`);
+                    console.warn(`[DEBUG] Direct ID lookup FAILED: ${e.response?.status}`);
                 }
             }
 
-            // 2. Fallback: Search by name/email (or ID if previous failed)
+            // 2. Fallback: Search by name/email
             if (!targetUser) {
-                const searchUrl = `${API}/api/users/search?q=${cleanUsername}`;
-                console.log(`[DEBUG] Attempting fallback search: ${searchUrl}`);
+                const searchUrl = `/api/users/search?q=${cleanUsername}`;
                 try {
-                    const searchRes = await axios.get(searchUrl, authConfig);
-                    console.log(`[DEBUG] Fallback search returned ${searchRes.data.length} results`);
-
-                    // Find most likely match or first result
+                    // ✅ USE CENTRALIZED API INSTANCE
+                    const searchRes = await API.get(searchUrl);
                     const resolved = searchRes.data.find(u => u.name.toLowerCase() === cleanUsername.toLowerCase()) ||
                         searchRes.data.find(u => u._id === cleanUsername) ||
                         searchRes.data[0];
 
                     if (resolved && resolved._id) {
-                        console.log(`[DEBUG] Search resolved to user: ${resolved._id}. Fetching full profile stats.`);
-                        const profileRes = await axios.get(`${API}/api/users/profile/${resolved._id}`, authConfig);
+                        const profileRes = await API.get(`/api/users/profile/${resolved._id}`);
                         targetUser = profileRes.data;
                     }
                 } catch (e) {
@@ -92,9 +78,9 @@ const PublicProfile = () => {
                 setIsFollowing(targetUser.isFollowing || false);
 
                 // 3. Knowledge Feed Logic
-                const articlesRes = await axios.get(`${API}/knowledge/all`);
+                // ✅ USE CENTRALIZED API INSTANCE
+                const articlesRes = await API.get('/knowledge/all');
                 const tId = targetUser.id || targetUser._id;
-                console.log(`[DEBUG] Fetching articles for author ID: ${tId}`);
                 const items = articlesRes.data.filter(item => {
                     const authorId = (item.author?._id || item.author)?.toString();
                     return authorId === tId?.toString();
@@ -109,7 +95,6 @@ const PublicProfile = () => {
                 setStats({ likes: totalLikes, reviews: totalComments });
                 setKnowledgeList(items);
             } else {
-                // If still no user, reset state
                 setProfileUser(null);
             }
 
@@ -120,21 +105,19 @@ const PublicProfile = () => {
         }
     };
 
-
-
     const toggleFollow = async () => {
         if (!currentUser) return navigate('/login');
         if (!profileUser) return;
 
         try {
-            const token = localStorage.getItem('token');
-            const authConfig = { headers: { Authorization: `Bearer ${token}` } };
-
+            const userId = profileUser.id || profileUser._id;
             if (isFollowing) {
-                await axios.post(`${API}/api/users/unfollow/${profileUser.id}`, {}, authConfig);
+                // ✅ USE CENTRALIZED API INSTANCE
+                await API.post(`/api/users/unfollow/${userId}`);
                 setFollowersCount(prev => prev - 1);
             } else {
-                await axios.post(`${API}/api/users/follow/${profileUser.id}`, {}, authConfig);
+                // ✅ USE CENTRALIZED API INSTANCE
+                await API.post(`/api/users/follow/${userId}`);
                 setFollowersCount(prev => prev + 1);
             }
             setIsFollowing(!isFollowing);
@@ -148,15 +131,16 @@ const PublicProfile = () => {
         if (!profileUser) return;
 
         try {
-            const token = localStorage.getItem('token');
-            const authConfig = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.post(`${API}/api/chat/conversation`, { participantId: profileUser.id }, authConfig);
+            const userId = profileUser.id || profileUser._id;
+            // ✅ USE CENTRALIZED API INSTANCE
+            await API.post('/api/chat/conversation', { participantId: userId });
             navigate('/chat');
         } catch (err) {
             console.error("Error starting conversation", err);
         }
     };
 
+    if (loading) return null;
 
     return (
         <div style={{ background: 'var(--bg-primary)', minHeight: '100vh', color: 'var(--text-primary)' }}>
@@ -178,7 +162,7 @@ const PublicProfile = () => {
                         Active {profileUser?.role === 'student' ? 'Learner' : 'Contributor'}
                     </div>
 
-                    {((currentUser?.id || currentUser?._id) !== profileUser?.id) && (
+                    {((currentUser?.id || currentUser?._id) !== profileUser?.id && (currentUser?.id || currentUser?._id) !== profileUser?._id) && (
                         <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                             <button
                                 onClick={toggleFollow}
@@ -195,7 +179,6 @@ const PublicProfile = () => {
                                 }}
                             >
                                 {isFollowing ? 'Following' : 'Follow'}
-
                             </button>
                             <button
                                 onClick={handleMessage}
@@ -246,8 +229,6 @@ const PublicProfile = () => {
                     </div>
                 </div>
 
-
-
                 {/* Stats Grid */}
                 <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '3rem' }}>
                     <div className="stat-card" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '1.5rem', borderRadius: '20px', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
@@ -290,6 +271,7 @@ const PublicProfile = () => {
                             }}
                                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                                onClick={() => navigate(`/view/${item._id}`)}
                             >
                                 <div className="item-icon" style={{
                                     width: '40px',
@@ -310,7 +292,7 @@ const PublicProfile = () => {
                                         {new Date(item.createdAt).toLocaleDateString()} • {item.likes ? item.likes.length : 0} Likes
                                     </span>
                                 </div>
-                                <Link to={`/view/${item._id}`} style={{ marginLeft: 'auto', textDecoration: 'none' }}>
+                                <div style={{ marginLeft: 'auto' }}>
                                     <button style={{
                                         background: 'var(--accent-primary)',
                                         color: '#fff',
@@ -319,14 +301,10 @@ const PublicProfile = () => {
                                         borderRadius: '8px',
                                         fontWeight: '600',
                                         cursor: 'pointer',
-                                        transition: 'opacity 0.2s'
-                                    }}
-                                        onMouseEnter={(e) => e.target.style.opacity = '0.9'}
-                                        onMouseLeave={(e) => e.target.style.opacity = '1'}
-                                    >
+                                    }}>
                                         Read
                                     </button>
-                                </Link>
+                                </div>
                             </div>
                         ))
                     )}

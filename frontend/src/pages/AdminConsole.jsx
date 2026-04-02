@@ -1,9 +1,7 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaUsers, FaEdit, FaTrash, FaLayerGroup, FaDatabase, FaComments } from 'react-icons/fa';
+import { FaEye, FaUsers, FaEdit, FaTrash, FaLayerGroup, FaComments } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
@@ -53,10 +51,8 @@ const AdminConsole = () => {
 
     const fetchStats = async () => {
         try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.get(`${API}/knowledge/admin/stats`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE (Interceptors handle token)
+            const res = await API.get('/knowledge/admin/stats');
             setDashboardStats(res.data);
         } catch (err) {
             console.error("Error fetching admin stats:", err);
@@ -65,10 +61,8 @@ const AdminConsole = () => {
 
     const fetchArticles = async () => {
         try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.get(`${API}/knowledge/admin/articles?limit=50`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/knowledge/admin/articles?limit=50');
             setArticles(res.data.articles || []);
         } catch (err) {
             console.error(err);
@@ -78,10 +72,8 @@ const AdminConsole = () => {
 
     const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-            const res = await axios.get(`${API}/knowledge/admin/users?limit=50`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            // ✅ USE CENTRALIZED API INSTANCE
+            const res = await API.get('/knowledge/admin/users?limit=50');
             setUsers(res.data.users || []);
         } catch (err) {
             console.error(err);
@@ -92,10 +84,8 @@ const AdminConsole = () => {
     const handleDeleteArticle = async (id) => {
         if (window.confirm("Are you sure you want to permanently delete this article?")) {
             try {
-                const token = localStorage.getItem('token');
-                await axios.delete(`${API}/knowledge/delete/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                // ✅ USE CENTRALIZED API INSTANCE
+                await API.delete(`/knowledge/delete/${id}`);
                 toast.success("Article deleted");
                 fetchArticles();
                 fetchStats();
@@ -126,8 +116,8 @@ const AdminConsole = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const filteredArticles = articles.filter(a => a.title.toLowerCase().includes(search.toLowerCase()));
-    const filteredUsers = users.filter(u => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase()));
+    const filteredArticles = articles.filter(a => a.title?.toLowerCase().includes(search.toLowerCase()));
+    const filteredUsers = users.filter(u => u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase()));
 
     const getCategoryStyles = (category) => {
         const cat = category?.toLowerCase() || 'general';
@@ -236,12 +226,12 @@ const AdminConsole = () => {
                         <button
                             onClick={() => setActiveTab('users')}
                             style={{
-                                background: 'transparent',
+                                background: activeTab === 'users' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                                 border: 'none',
                                 color: activeTab === 'users' ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                 padding: '12px 20px',
+                                borderRadius: '8px',
                                 cursor: 'pointer',
-                                borderBottom: activeTab === 'users' ? '2px solid var(--accent-primary)' : 'none',
                                 fontWeight: activeTab === 'users' ? '700' : '500',
                                 transition: 'all 0.2s',
                                 display: 'flex',
@@ -328,7 +318,7 @@ const AdminConsole = () => {
                                     )
                                 })}
                                 {filteredArticles.length === 0 && (
-                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
                                         No articles match your search.
                                     </div>
                                 )}
@@ -395,7 +385,7 @@ const AdminConsole = () => {
                                     </div>
                                 ))}
                                 {filteredUsers.length === 0 && (
-                                    <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                    <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-secondary)' }}>
                                         No users match your search.
                                     </div>
                                 )}

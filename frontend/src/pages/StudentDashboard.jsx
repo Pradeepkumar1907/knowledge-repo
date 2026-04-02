@@ -1,7 +1,5 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaBook, FaEye, FaHeart, FaLayerGroup, FaCalendarAlt, FaClock, FaCheckCircle, FaBookmark } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
@@ -16,7 +14,7 @@ const StudentDashboard = () => {
     const [readArticles, setReadArticles] = useState([]);
     const [likedCount, setLikedCount] = useState(0);
     const [categoriesExplored, setCategoriesExplored] = useState(0);
-
+    const [loading, setLoading] = useState(true);
 
     // Sidebar State
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -40,10 +38,8 @@ const StudentDashboard = () => {
             }
 
             try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get(`${API}/auth/me`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                // ✅ USE CENTRALIZED API INSTANCE
+                const res = await API.get('/auth/me');
 
                 setUser(res.data);
                 sessionStorage.setItem('user', JSON.stringify(res.data));
@@ -59,10 +55,8 @@ const StudentDashboard = () => {
                 });
                 setCategoriesExplored(cats.size || 3); // Fallback to 3 for visual purposes if empty
 
-
                 setLoading(false);
             } catch (err) {
-
                 console.error("Error fetching user data:", err);
                 if (err.response?.status === 403 || err.response?.status === 401) {
                     navigate('/login');

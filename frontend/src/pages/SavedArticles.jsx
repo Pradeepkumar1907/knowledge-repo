@@ -1,7 +1,5 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ArticleCard from '../components/ArticleCard';
 import { FaBookmark } from 'react-icons/fa';
@@ -20,10 +18,8 @@ const SavedArticles = () => {
 
         const fetchBookmarks = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get(`${API}/knowledge/user/bookmarks`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                // ✅ USE CENTRALIZED API INSTANCE
+                const res = await API.get('/knowledge/user/bookmarks');
                 setArticles(res.data);
             } catch (err) {
                 console.error("Failed to fetch bookmarks:", err);
@@ -37,12 +33,11 @@ const SavedArticles = () => {
 
     return (
         <div className="container" style={{ minHeight: '100vh', padding: '2rem 1rem' }}>
-            <div className="dash-header" style={{ marginBottom: '2rem', background: 'var(--nav-bg)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>
+            <div className="dash-header" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--text-primary)' }}>
                 <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: '1.2rem', cursor: 'pointer' }}>{'<'}</button>
                 <h2 style={{ fontSize: '1.5rem', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <FaBookmark style={{ color: 'var(--accent-primary)' }} /> Saved Articles
                 </h2>
-                <div style={{ width: '20px' }}></div>
             </div>
 
             {loading ? (

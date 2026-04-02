@@ -1,9 +1,7 @@
-
 import API from '../api';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaBook, FaCode, FaFlask, FaHistory, FaCalculator, FaGlobe, FaFire, FaLayerGroup, FaUserFriends } from 'react-icons/fa';
+import { FaSearch, FaBook, FaCode, FaFlask, FaHistory, FaCalculator, FaGlobe, FaFire, FaLayerGroup } from 'react-icons/fa';
 import ArticleCard from '../components/ArticleCard';
 
 const Home = () => {
@@ -52,13 +50,14 @@ const Home = () => {
     const fetchAllData = async () => {
         try {
             setLoading(true);
+            // ✅ USE CENTRALIZED API INSTANCE
             const [allRes, featuredRes, trendingTodayRes, trendingWeekRes, statsRes, catsRes] = await Promise.all([
-                axios.get(`${API}/knowledge/all`),
-                axios.get(`${API}/knowledge/featured`),
-                axios.get(`${API}/knowledge/trending?timeframe=today`),
-                axios.get(`${API}/knowledge/trending?timeframe=week`),
-                axios.get(`${API}/knowledge/stats`),
-                axios.get(`${API}/knowledge/categories`)
+                API.get('/knowledge/all'),
+                API.get('/knowledge/featured'),
+                API.get('/knowledge/trending?timeframe=today'),
+                API.get('/knowledge/trending?timeframe=week'),
+                API.get('/knowledge/stats'),
+                API.get('/knowledge/categories')
             ]);
 
             setArticles(allRes.data);
