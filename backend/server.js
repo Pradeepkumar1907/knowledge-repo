@@ -7,6 +7,10 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const app = express();
+app.use(cors({
+  origin: "https://knowledge-repo-rose.vercel.app",
+  credentials: true
+}));
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
