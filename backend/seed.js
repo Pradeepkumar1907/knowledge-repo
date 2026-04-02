@@ -4,7 +4,7 @@ const User = require('./models/User');
 const Category = require('./models/Category');
 
 // Connect to MongoDB
-const MONGO_URI = "mongodb://127.0.0.1:27017/knowledge_repo";
+const MONGO_URI = "mongodb+srv://pradeep071905_db_user:pradeep071905_db_user@knowrepo.wacwjpt.mongodb.net/?appName=knowrepo";
 
 const categories = ['Programming', 'Science', 'Math', 'History', 'General'];
 const authors = ['Robert', 'Allen', 'Steve', 'Dustin', 'Peter'];
