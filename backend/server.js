@@ -42,7 +42,7 @@ const knowledgeRoutes = require('./routes/knowledgeRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-app.use(authRoutes);
+app.use('/auth', authRoutes);
 app.use('/knowledge', knowledgeRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/users', userRoutes);

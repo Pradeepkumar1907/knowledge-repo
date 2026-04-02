@@ -1,5 +1,5 @@
 
-const API = import.meta.env.VITE_API_URL;
+import API from '../../api';
 import React, { useState } from 'react';
 import Avatar from '../Avatar';
 import axios from 'axios';

@@ -1,5 +1,5 @@
 
-const API = import.meta.env.VITE_API_URL;
+import API from '../api';
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';

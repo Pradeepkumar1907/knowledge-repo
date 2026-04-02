@@ -4,7 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FaBook, FaCheckCircle } from 'react-icons/fa';
 
-const API = import.meta.env.VITE_API_URL;
+import API from '../api';
 
 const Login = () => {
     const navigate = useNavigate();

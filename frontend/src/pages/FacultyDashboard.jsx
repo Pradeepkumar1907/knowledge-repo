@@ -9,7 +9,7 @@ import StatCard from '../components/StatCard';
 import Analytics from '../components/Analytics';
 
 // ✅ USE ENV VARIABLE
-const API = import.meta.env.VITE_API_URL;
+import API from '../api';
 
 const FacultyDashboard = () => {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ const FacultyDashboard = () => {
         try {
             const token = localStorage.getItem('token');
 
-            const res = await axios.get(`${API}/me`, {
+            const res = await axios.get(`${API}/auth/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

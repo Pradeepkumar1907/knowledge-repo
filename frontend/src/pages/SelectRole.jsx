@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { FaUserGraduate, FaChalkboardTeacher } from 'react-icons/fa';
 
 // ✅ API URL from Vercel ENV
-const API = import.meta.env.VITE_API_URL;
+import API from '../api';
 
 const SelectRole = () => {
     const navigate = useNavigate();

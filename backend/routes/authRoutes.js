@@ -13,7 +13,7 @@ const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 
 // ================= GOOGLE LOGIN =================
-router.post('/auth/google', async (req, res) => {
+router.post('/google', async (req, res) => {
     try {
         const { idToken } = req.body;
 
@@ -98,7 +98,7 @@ router.post('/auth/google', async (req, res) => {
 
 
 // ================= SET ROLE =================
-router.post('/auth/set-role', auth.requireAuth, async (req, res) => {
+router.post('/set-role', auth.requireAuth, async (req, res) => {
     try {
         const { role } = req.body;
 
